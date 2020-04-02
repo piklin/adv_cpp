@@ -76,3 +76,11 @@ void Process::close() {
         std::cerr << std::strerror(errno);
     }
 }
+
+bool isReadable() const {
+    if (read(read_from_fd, NULL, 0)) {
+        return false;
+    } else {
+        return true;
+    }
+}
