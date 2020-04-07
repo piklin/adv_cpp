@@ -1,24 +1,21 @@
-#include <iostream>
-#include <vector>
-
 #include "Process.h"
-
-#define BIN_PATH "/bin/cat"
 
 int main() {
 
-    std::string data = nullptr;
+    std::string data;
 
     try {
-        Process p(BIN_PATH);
+        const std::string bin_path("/bin/cat");
+        Process p(bin_path);
 
-        std::getline(std::cin, data));
+        std::getline(std::cin, data);
         p.write(data.c_str(), data.length());
-        char readed_data[data.length()];
+        auto *readed_data = new char[data.length()];
         p.read(readed_data, data.length());
         std::cout << std::string(readed_data) << std::endl;
 
-    } catch(...) {
+    } catch(std::exception &e) {
+        std::cout << e.what();
         return -1;
     }
     return 0;

@@ -8,11 +8,41 @@
 #include <iostream>
 #include <cstdio>
 
-    class Process {
+class PipeError: public std::exception {
+public:
+    explicit PipeError(std::string);
+    virtual const char* what() const throw();
+private:
+    std::string what_str;
+};
+
+
+class ProcessError: public std::exception {
+public:
+    explicit ProcessError(std::string);
+    virtual const char* what() const throw();
+private:
+    std::string what_str;
+};
+
+class Pipe {
+private:
+    int fd[2];
+public:
+    explicit Pipe();
+    ~Pipe();
+    int fd_read();
+    int fd_write();
+};
+
+
+class Process {
     private:
         pid_t pid;
-        int write_to_fd;
+        Pipe pipe_to;
+        Pipe pipe_from;
         int read_from_fd;
+        int write_to_fd;
     public:
         explicit Process(const std::string &path);
 
@@ -31,6 +61,6 @@
         void closeStdin();
 
         void close();
-    };
+};
 
 #endif //HW1_PROCESS_H
