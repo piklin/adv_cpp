@@ -10,9 +10,9 @@ int main() {
 
         std::getline(std::cin, data);
         p.write(data.c_str(), data.length());
-        auto *readed_data = new char[data.length()];
-        p.read(readed_data, data.length());
-        std::cout << std::string(readed_data) << std::endl;
+        std::string data1(data.length(), '\0');
+        p.read(data1.data(), data.length());
+        std::cout << data1 << std::endl;
 
     } catch(std::exception &e) {
         std::cout << e.what();

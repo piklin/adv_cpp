@@ -8,14 +8,6 @@
 #include <iostream>
 #include <cstdio>
 
-class PipeError: public std::exception {
-public:
-    explicit PipeError(std::string);
-    virtual const char* what() const throw();
-private:
-    std::string what_str;
-};
-
 
 class ProcessError: public std::exception {
 public:
@@ -23,6 +15,23 @@ public:
     virtual const char* what() const throw();
 private:
     std::string what_str;
+};
+
+class ForkError: public ProcessError {
+    using ProcessError::ProcessError;
+};
+
+class PipeError: public ProcessError {
+    using ProcessError::ProcessError;
+};
+
+class Fork {
+private:
+    int pid;
+public:
+    explicit Fork();
+    ~Fork();
+    size_t get_pid();
 };
 
 class Pipe {
@@ -38,11 +47,13 @@ public:
 
 class Process {
     private:
-        pid_t pid;
         Pipe pipe_to;
         Pipe pipe_from;
+        Fork pr;
         int read_from_fd;
         int write_to_fd;
+        bool is_readable;
+        int pid;
     public:
         explicit Process(const std::string &path);
 
