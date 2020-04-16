@@ -52,6 +52,11 @@ namespace net {
         void set_timeout(int);
         void connect(std::string, size_t);
 
+        std::string get_dst_addr();
+        std::string get_src_addr();
+        size_t get_src_port();
+        size_t get_dst_port();
+
         friend Connection net::Server::accept();
     private:
         Connection(int, std::string, std::string, size_t, size_t);

@@ -98,6 +98,22 @@ void net::Connection::connect(std::string str_addr, size_t port) {
 
 }
 
+std::string net::Connection::get_dst_addr() {
+    return dst_addr_;
+}
+
+std::string net::Connection::get_src_addr() {
+    return src_addr_;
+}
+
+size_t net::Connection::get_dst_port() {
+    return dst_port_;
+}
+
+size_t net::Connection::get_src_port() {
+    return src_port_;
+}
+
 ///class Server
 
 net::Server::Server(std::string str_addr, size_t port) : fd_(-1) {
