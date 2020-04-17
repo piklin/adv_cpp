@@ -11,8 +11,8 @@
 
 class ProcessError: public std::exception {
 public:
-    explicit ProcessError(std::string);
-    virtual const char* what() const throw();
+    explicit ProcessError(const std::string &);
+    const char* what() const noexcept override;
 private:
     std::string what_str;
 };
@@ -33,6 +33,7 @@ public:
     ~Pipe();
     int fd_read();
     int fd_write();
+    void close();
 };
 
 
