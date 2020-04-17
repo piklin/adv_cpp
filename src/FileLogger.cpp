@@ -1,9 +1,9 @@
 #include "FileLogger.h"
 
-log::FileLogger::FileLogger(std::string path, Level level) : BaseLogger(level) {
+log::FileLogger::FileLogger(const std::string &path, log::Level level) : log::BaseLogger(level) {
     out_stream_.open(path);
     if (!out_stream_.is_open()) {
-        throw BaseLoggerError("file open error");
+        throw log::BaseLoggerError("file open error");
     }
 }
 
@@ -11,7 +11,7 @@ log::FileLogger::~FileLogger() {
     out_stream_.close();
 }
 
-void log::FileLogger::log(const std::string &str_error, const log::Level &level) {
+void log::FileLogger::log(const std::string &str_error, log::Level level) {
     out_stream_ << str_error << std::endl;
 }
 

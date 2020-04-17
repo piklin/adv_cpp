@@ -12,7 +12,7 @@ namespace log {
         void flush() override;
 
     private:
-        void log(const std::string &, const log::Level &) override;
+        void log(const std::string &, log::Level) override;
     };
 
 }

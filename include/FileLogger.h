@@ -7,14 +7,14 @@ namespace log {
 
     class FileLogger : public BaseLogger {
     public:
-        FileLogger(std::string, log::Level);
+        FileLogger(const std::string &, log::Level);
 
         ~FileLogger();
 
         void flush() override;
 
     private:
-        void log(const std::string &, const log::Level &) override;
+        void log(const std::string &, log::Level) override;
 
         std::ofstream out_stream_;
     };

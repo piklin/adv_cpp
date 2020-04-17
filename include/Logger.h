@@ -7,7 +7,7 @@
 
 namespace log {
 
-    enum log_level {
+    enum class Level : size_t {
         ERROR,
         WARNING,
         INFO,
@@ -29,25 +29,15 @@ namespace log {
     };
 
 
-    class Level {
-    public:
-        explicit Level(log::log_level);
-
-        log::log_level get_level() const;
-    private:
-        log::log_level level_;
-    };
-
-
     class BaseLogger {
     public:
         explicit BaseLogger(log::Level);
 
-        void set_level(log::Level &);
+        void set_level(log::Level);
 
         log::Level level() const;
 
-        void check_level(const std::string &, log::log_level);
+        void check_level(const std::string &, log::Level);
 
         virtual void flush() = 0;
 
@@ -59,10 +49,8 @@ namespace log {
 
         void debug(const std::string &);
 
-        friend bool operator>=(log::Level const &, log::Level const &);
-
     private:
-        virtual void log(const std::string &, const log::Level &) = 0;
+        virtual void log(const std::string &, log::Level) = 0;
 
         log::Level level_;
     };

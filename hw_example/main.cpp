@@ -4,11 +4,9 @@
 #include "StdoutLogger.h"
 
 int main(){
-    log::Level l1(log::WARNING);
-    log::Level l2(log::INFO);
 
-    log::FileLogger a("./test", l1);
-    log::StderrLogger b(l2);
+    log::FileLogger a("./test", log::Level::ERROR);
+    log::StderrLogger b(log::Level::WARNING);
 
     a.error("one");
     a.warning("two");
