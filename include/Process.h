@@ -25,15 +25,6 @@ class PipeError: public ProcessError {
     using ProcessError::ProcessError;
 };
 
-class Fork {
-private:
-    int pid;
-public:
-    explicit Fork();
-    ~Fork();
-    size_t get_pid();
-};
-
 class Pipe {
 private:
     int fd[2];
@@ -49,7 +40,6 @@ class Process {
     private:
         Pipe pipe_to;
         Pipe pipe_from;
-        Fork pr;
         int read_from_fd;
         int write_to_fd;
         bool is_readable;

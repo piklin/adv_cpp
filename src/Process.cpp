@@ -1,24 +1,6 @@
 #include "Process.h"
 
-//fork
-Fork::Fork() {
-    pid = fork();
-    if (pid == -1) {
-        throw ForkError("Fork error");
-    }
-}
-
-Fork::~Fork() {
-    kill(pid, SIGTERM);
-    waitpid(pid, nullptr, 0);
-}
-
-size_t Fork::get_pid() {
-    return static_cast<size_t>(pid);
-}
-
-
-//pipe
+///pipe
 Pipe::Pipe() {
     if(pipe(fd) == -1) {
         throw PipeError("Error creating pipe");
@@ -39,7 +21,7 @@ int Pipe::fd_write() {
 }
 
 
-//process exception
+///process exception
 ProcessError::ProcessError(std::string err) {
     what_str = err;
 }
@@ -48,36 +30,34 @@ const char* ProcessError::what() const throw() {
 }
 
 
-//class process
+///class process
 Process::Process(const std::string &path) {
-    try {
+    pid = fork();
+    if (pid == -1) {
+        throw ProcessError("Forking error");
+    }
 
-        if (pr.get_pid() == 0) {
-            ::close(pipe_to.fd_write());
-            ::close(pipe_from.fd_read());
-            dup2(pipe_to.fd_read(), STDIN_FILENO);
-            dup2(pipe_from.fd_write(), STDOUT_FILENO);
+    if (pid == 0) {
+        ::close(pipe_to.fd_write());
+        ::close(pipe_from.fd_read());
+        dup2(pipe_to.fd_read(), STDIN_FILENO);
+        dup2(pipe_from.fd_write(), STDOUT_FILENO);
 
-            if (execl(path.c_str(), path.c_str(), nullptr) == -1) {
-                throw ProcessError("execl error");
-            }
-        } else {
-            ::close(pipe_to.fd_read());
-            ::close(pipe_from.fd_write());
-            write_to_fd = pipe_to.fd_write();
-            read_from_fd = pipe_from.fd_read();
-            is_readable = true;
+        if (execl(path.c_str(), path.c_str(), nullptr) == -1) {
+            throw ProcessError("execl error");
         }
-
-    } catch (std::exception &e) {
-        throw;
+    } else {
+        ::close(pipe_to.fd_read());
+        ::close(pipe_from.fd_write());
+        write_to_fd = pipe_to.fd_write();
+        read_from_fd = pipe_from.fd_read();
+        is_readable = true;
     }
 }
 
     Process::~Process() {
         pipe_to.~Pipe();
         pipe_from.~Pipe();
-        pr.~Fork();
     }
 
     size_t Process::write(const void *data, size_t len) {
