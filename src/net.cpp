@@ -1,6 +1,6 @@
 #include "net.h"
 
-net::NetError::NetError(std::string str) : what_str_(str){
+net::NetError::NetError(const std::string &str) : what_str_(str){
 }
 
 const char *net::NetError::what() const noexcept {
@@ -9,12 +9,12 @@ const char *net::NetError::what() const noexcept {
 
 
 ///class Conection
-net::Connection::Connection(std::string str_addr, size_t port){
+net::Connection::Connection(const std::string &str_addr, size_t port){
     this->connect(str_addr, port);
 }
 
-net::Connection::Connection(int fd, std::string src_addr,
-                std::string dst_addr, size_t src_port, size_t dst_port)
+net::Connection::Connection(int fd, const std::string &src_addr,
+                const std::string &dst_addr, size_t src_port, size_t dst_port)
                 : fd_(fd), src_addr_(src_addr), dst_addr_(dst_addr), src_port_(src_port), dst_port_(dst_port) {}
 
 net::Connection::~Connection() {
@@ -26,7 +26,7 @@ void net::Connection::close() {
     ::close(fd_);
 }
 
-size_t net::Connection::write(std::string &str, size_t len) {
+size_t net::Connection::write(const std::string &str, size_t len) {
     ssize_t res = ::write(fd_, str.data(), len);
     if (res < 0) {
         throw NetError("write error");
@@ -44,14 +44,14 @@ size_t net::Connection::read(std::string &str, size_t len) {
     return static_cast<size_t>(res);
 }
 
-void net::Connection::writeExact(std::string data, size_t len) {
+void net::Connection::writeExact(const std::string &data, size_t len) {
     size_t res = this->write(data, len);
     if (res != len) {
         throw NetError("writeExact error");
     }
 }
 
-void net::Connection::readExact(std::string data, size_t len) {
+void net::Connection::readExact(std::string &data, size_t len) {
     size_t res = this->read(data, len);
     if (res != len) {
         throw NetError("readExact error");
@@ -66,7 +66,7 @@ void net::Connection::set_timeout(int seconds) {
     //i have problem
 }
 
-void net::Connection::connect(std::string str_addr, size_t port) {
+void net::Connection::connect(const std::string &str_addr, size_t port) {
     this->close();
     fd_ = socket(AF_INET, SOCK_STREAM, 0);
     if (fd_ < 0) {
@@ -98,25 +98,25 @@ void net::Connection::connect(std::string str_addr, size_t port) {
 
 }
 
-std::string net::Connection::get_dst_addr() {
+std::string net::Connection::get_dst_addr() const{
     return dst_addr_;
 }
 
-std::string net::Connection::get_src_addr() {
+std::string net::Connection::get_src_addr() const{
     return src_addr_;
 }
 
-size_t net::Connection::get_dst_port() {
+size_t net::Connection::get_dst_port() const{
     return dst_port_;
 }
 
-size_t net::Connection::get_src_port() {
+size_t net::Connection::get_src_port() const{
     return src_port_;
 }
 
 ///class Server
 
-net::Server::Server(std::string str_addr, size_t port) : fd_(-1) {
+net::Server::Server(const std::string &str_addr, size_t port) : fd_(-1) {
     this->open(str_addr, port);
 }
 
@@ -125,7 +125,7 @@ net::Server::~Server() {
     is_opened_ = false;
 }
 
-void net::Server::open(std::string str_addr, size_t port) {
+void net::Server::open(const std::string &str_addr, size_t port) {
     if (fd_ != -1) {
         this->close();
     }
