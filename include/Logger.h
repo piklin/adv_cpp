@@ -5,82 +5,69 @@
 #include <fstream>
 #include <map>
 
-class BaseLoggerError : public std::exception {
-public:
-    explicit BaseLoggerError(std::string);
-    virtual const char* what() const noexcept;
-private:
-    std::string what_string;
-};
+namespace log {
 
-class LoggerLevelError : public BaseLoggerError {
-    using BaseLoggerError::BaseLoggerError;
-};
+    enum log_level {
+        ERROR,
+        WARNING,
+        INFO,
+        DEBUG
+    };
 
+    class BaseLoggerError : public std::exception {
+    public:
+        explicit BaseLoggerError(const std::string &);
 
+        const char *what() const noexcept override;
 
-class Level {
-public:
-    explicit Level(std::string);
-    size_t get_level() const;
-    std::string get_str_level() const;
-private:
-    std::map<std::string, size_t> levels =  {{"error", 0},
-                                             {"warning", 1},
-                                             {"info", 2},
-                                             {"debug", 3}};
-    std::string str_l;
-};
+    private:
+        std::string what_string_;
+    };
+
+    class LoggerLevelError : public BaseLoggerError {
+        using log::BaseLoggerError::BaseLoggerError;
+    };
 
 
-class BaseLogger {
-public:
-    explicit BaseLogger(std::string);
-    explicit BaseLogger(Level);
+    class Level {
+    public:
+        explicit Level(log::log_level);
 
-    void set_level(Level &);
-    Level level() const;
-    virtual void flush() = 0;
-
-    void error(std::string);
-    void warning(std::string);
-    void info(std::string);
-    void debug(std::string);
-
-    friend bool operator>=(Level const &, Level const &);
-private:
-    virtual void log(std::string &, Level &) = 0;
-    Level level_;
-};
+        log::log_level get_level() const;
+    private:
+        log::log_level level_;
+    };
 
 
-class StdoutLogger : public BaseLogger {
-public:
-    using BaseLogger::BaseLogger;
+    class BaseLogger {
+    public:
+        explicit BaseLogger(log::Level);
 
-    void flush();
-private:
-    void log(std::string &, Level &);
-};
+        void set_level(log::Level &);
 
-class StderrLogger : public BaseLogger {
-public:
-    using BaseLogger::BaseLogger;
+        log::Level level() const;
 
-    void flush();
-private:
-    void log(std::string &, Level &);
-};
+        void check_level(const std::string &, log::log_level);
 
-class FileLogger : public BaseLogger {
-public:
-    FileLogger(std::string, Level);
-    ~FileLogger();
+        virtual void flush() = 0;
 
-    void flush();
-private:
-    void log(std::string &, Level &);
-    std::ofstream ostream;
-};
+        void error(const std::string &);
+
+        void warning(const std::string &);
+
+        void info(const std::string &);
+
+        void debug(const std::string &);
+
+        friend bool operator>=(log::Level const &, log::Level const &);
+
+    private:
+        virtual void log(const std::string &, const log::Level &) = 0;
+
+        log::Level level_;
+    };
+
+
+}
 
 #endif //HW2_LOGGER_H

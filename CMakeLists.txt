@@ -4,7 +4,7 @@ project(hw2)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_library(log SHARED src/Logger.cpp)
-target_include_directories(log PUBLIC src include)
+add_library(log SHARED src/Logger.cpp src/FileLogger.cpp src/StderrLogger.cpp src/StdoutLogger.cpp)
+target_include_directories(log PUBLIC include)
 
 add_subdirectory(hw_example)

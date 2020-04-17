@@ -1,33 +1,24 @@
 #include "Logger.h"
 
 ///errors
-BaseLoggerError::BaseLoggerError(std::string string) {
-    what_string = string;
+log::BaseLoggerError::BaseLoggerError(const std::string &string) {
+    what_string_ = string;
 }
 
-const char* BaseLoggerError::what() const noexcept {
-    return what_string.c_str();
+const char* log::BaseLoggerError::what() const noexcept {
+    return what_string_.c_str();
 }
 
 
 ///Level class
-Level::Level(std::string level) {
-    if (levels.count(level) == 0) {
-        throw LoggerLevelError("no level");
-    } else {
-        str_l = level;
-    }
+log::Level::Level(log::log_level l) : level_(l) {
 }
 
-size_t Level::get_level() const {
-    return levels.at(str_l);
+log::log_level log::Level::get_level() const {
+    return level_;
 }
 
-std::string Level::get_str_level() const {
-    return str_l;
-}
-
-bool operator>=(Level const &left, Level const &right) {
+bool operator>=(const log::Level &left, const log::Level &right) {
     if (left.get_level() >= right.get_level()) {
         return true;
     } else {
@@ -36,87 +27,43 @@ bool operator>=(Level const &left, Level const &right) {
 }
 
 ///BaseLogger class
-BaseLogger::BaseLogger(std::string str_level) : level_(Level(str_level)) {
+
+log::BaseLogger::BaseLogger(log::Level level) : level_(level) {
 }
 
-BaseLogger::BaseLogger(Level level) : level_(level) {
-}
-
-void BaseLogger::set_level(Level &level) {
+void log::BaseLogger::set_level(log::Level &level) {
     level_ = level;
 }
 
-Level BaseLogger::level() const {
+log::Level log::BaseLogger::level() const {
     return level_;
 }
 
-void BaseLogger::error(std::string str_error) {
-    std::string str_level = "error";
-    Level l(str_level);
-    if (level_ >= l){
-        log(str_error, l);
-    }
+void log::BaseLogger::error(const std::string &str_error) {
+    check_level(str_error, ERROR);
 }
 
-void BaseLogger::warning(std::string str_error) {
-    std::string str_level = "warning";
-    Level l(str_level);
-    if (level_ >= l){
-        log(str_error, l);
-    }
+void log::BaseLogger::warning(const std::string &str_error) {
+    check_level(str_error, WARNING);
 }
 
-void BaseLogger::info(std::string str_error) {
-    std::string str_level = "info";
-    Level l(str_level);
-    if (level_ >= l){
-        log(str_error, l);
-    }
+void log::BaseLogger::info(const std::string &str_error) {
+    check_level(str_error, INFO);
 }
 
-void BaseLogger::debug(std::string str_error) {
-    std::string str_level = "debug";
-    Level l(str_level);
-    if (level_ >= l){
-        log(str_error, l);
+void log::BaseLogger::debug(const std::string &str_error) {
+    check_level(str_error, DEBUG);
+}
+
+void log::BaseLogger::check_level(const std::string &str, log::log_level l) {
+    Level level(l);
+    if (level_ >= level){
+        log(str, level);
     }
 }
 
 
-///BaseLogger's children
-void StdoutLogger::log(std::string &str_error, Level &level) {
-    std::cout << "[" + level.get_str_level() + "] " + str_error << std::endl;
-}
-
-void StdoutLogger::flush() {
-    std::cout.flush();
-}
 
 
-void StderrLogger::log(std::string &str_error, Level &level) {
-    std::cerr << "[" + level.get_str_level() + "] " + str_error << std::endl;
-}
-
-void StderrLogger::flush() {
-    std::cerr.flush();
-}
 
 
-FileLogger::FileLogger(std::string path, Level level) : BaseLogger(level) {
-    ostream.open(path);
-    if (!ostream.is_open()) {
-        throw BaseLoggerError("file open error");
-    }
-}
-
-FileLogger::~FileLogger() {
-    ostream.close();
-}
-
-void FileLogger::log(std::string &str_error, Level &level) {
-    ostream << "[" + level.get_str_level() + "] " + str_error << std::endl;
-}
-
-void FileLogger::flush() {
-    ostream.flush();
-}
