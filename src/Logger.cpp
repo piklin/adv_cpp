@@ -1,5 +1,10 @@
 #include "Logger.h"
 
+std::map<size_t, std::string> levels = {{0, "Error"},
+                                        {1, "Warning"},
+                                        {2, "Info"},
+                                        {3, "Debug"}};
+
 ///errors
 log::BaseLoggerError::BaseLoggerError(const std::string &string) {
     what_string_ = string;
@@ -42,4 +47,8 @@ void log::BaseLogger::check_level(const std::string &str, log::Level l) {
     if (level_ >= l){
         log(str, l);
     }
+}
+
+std::string log::BaseLogger::get_str_level(log::Level l) {
+    return levels[static_cast<size_t>(l)];
 }

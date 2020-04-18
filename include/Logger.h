@@ -39,6 +39,8 @@ namespace log {
 
         void check_level(const std::string &, log::Level);
 
+        std::string get_str_level(log::Level);
+
         virtual void flush() = 0;
 
         void error(const std::string &);
