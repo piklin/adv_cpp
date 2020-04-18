@@ -16,6 +16,16 @@ int main() {
     a.write(b, 3);
     std::string buf(10, '\0');
     a.read(buf, 5);
+    net::Connection a2(std::move(a));
+    a.close();
+    a2.write(b, 3);
+
+    net::Server ss = std::move(s);
+
+    net::Connection aa = ss.accept();
+    aa.write(b, 3);
+
     std::cout << buf << std::endl;
 
+    std::cout << a2.get_dst_port() << "  " << a2.get_src_addr() << std::endl;
 }
