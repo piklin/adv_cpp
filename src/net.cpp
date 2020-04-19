@@ -87,10 +87,10 @@ namespace net {
                 .tv_sec = seconds,
         };
 
-        if (setsockopt(fd_, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, sizeof(timeout)) < 0) {
+        if (setsockopt(fd_, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout)) < 0) {
             throw(NetError("connection set_timeout: setsockopt error"));
         }
-        if (setsockopt(fd_, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0) {
+        if (setsockopt(fd_, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
             throw(NetError("connection set_timeout: setsockopt error"));
         }
     }
