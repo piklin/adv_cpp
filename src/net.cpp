@@ -83,7 +83,16 @@ namespace net {
     }
 
     void Connection::set_timeout(int seconds) {
-        //i have problem
+        timeval timeout {
+                .tv_sec = seconds,
+        };
+
+        if (setsockopt(fd_, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, sizeof(timeout)) < 0) {
+            throw(NetError("connection set_timeout: setsockopt error"));
+        }
+        if (setsockopt(fd_, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0) {
+            throw(NetError("connection set_timeout: setsockopt error"));
+        }
     }
 
     void Connection::connect(const std::string &str_addr, size_t port) {

@@ -28,4 +28,7 @@ int main() {
     std::cout << buf << std::endl;
 
     std::cout << a2.get_dst_port() << "  " << a2.get_src_addr() << std::endl;
+
+    a2.read(buf, 5);
+    return 0;
 }
