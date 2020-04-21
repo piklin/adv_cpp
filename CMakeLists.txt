@@ -1,0 +1,9 @@
+cmake_minimum_required(VERSION 3.10)
+
+project(hw4)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+#add_library(mp SHARED )
+
+add_subdirectory(example)
