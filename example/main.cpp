@@ -6,39 +6,33 @@
 #include <arpa/inet.h>
 #include <sys/epoll.h>
 
-#ifndef SOCK_NONBLOCK
-#include <fcntl.h>
-#define SOCK_NONBLOCK O_NONBLOCK
-#endif
-
+#include "Server.h"
+#include "Connection.h"
 
 int main(){
-    std::string ip_addr("127.0.0.1");
-    size_t port = 34567;
 
-    int socket_fd = ::socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
+    auto handle = [](mp::Connection &conn) {
+        constexpr uint str_size = 8;
+        uint event = conn.get_last_event();
+        if (event & EPOLLERR || event & EPOLLHUP) {
+            std::cout << conn.get_dst_addr() << ":" << conn.get_dst_port() << " closed" << std::endl;
+        } else if (event & EPOLLIN) {
+            std::string str(str_size - conn.input_size(), '\0');
+            conn.read(str, str_size - conn.input_size());
 
-    sockaddr_in srv_addr {};
-    srv_addr.sin_family = AF_INET;
-    srv_addr.sin_port = htons(port);
-    if (inet_aton(ip_addr.data(), &srv_addr.sin_addr) == 0) {
-        exit(EXIT_FAILURE);
+            if (conn.input_size() == str_size) {
+                conn.write(conn.input(), conn.input_size());
+                conn.clear_input();
+            }
+
+        }
+    };
+    try {
+        mp::Server s("127.0.0.1", 34567, 10, handle);
+        s.loop();
+    } catch (std::exception &e) {
+        std::cout << e.what() << std::endl;
     }
-
-    socklen_t addr_size = sizeof(srv_addr);
-
-    if (::bind(socket_fd, (sockaddr *)&srv_addr, addr_size) < 0) {
-        exit(EXIT_FAILURE);
-    }
-
-    if (::listen(socket_fd, 256) < 0) {
-        exit(EXIT_FAILURE);
-    }
-
-    int epoll_fd = epoll_create(1);
-
-
-
     return 0;
 }
 
