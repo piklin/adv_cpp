@@ -11,6 +11,7 @@
 
 namespace net {
 
+    class Connection;
     int default_max_connect = 16;
 
     class Server {
